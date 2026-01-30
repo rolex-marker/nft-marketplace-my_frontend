@@ -130,7 +130,7 @@ const ItemDetailPage: React.FC<ItemDetailPageProps> = ({ marketplace, nft, accou
   
         const acceptedOffer = offers[index];
         await axios.post(
-            "http://localhost:4000/transactions",
+            "http://83.234.227.67:4000/transactions",
             {
               itemId: item?.itemId,
               tokenId: item?.tokenId,
@@ -179,7 +179,7 @@ const ItemDetailPage: React.FC<ItemDetailPageProps> = ({ marketplace, nft, accou
     
 
     await axios.post(
-      "http://localhost:4000/transactions/",
+      "http://83.234.227.67:4000/transactions/",
       {
         itemId: item?.itemId,
         tokenId: item?.tokenId || null,
@@ -347,7 +347,7 @@ const finalizeAuction = async () => {
 
       if (token) {
         await axios.post(
-          "http://localhost:4000/transactions",
+          "http://83.234.227.67:4000/transactions",
           {
             itemId: item?.itemId,
             tokenId: item?.tokenId,

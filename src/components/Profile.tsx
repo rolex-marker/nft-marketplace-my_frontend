@@ -57,7 +57,7 @@ interface ProfilePageProps {
   console.log("token>>>", token);
 
   useEffect(() => {
-    axios.get("http://localhost:4000/profile", {
+    axios.get("http://83.234.227.67:4000/profile", {
       headers: { Authorization: `Bearer ${token}` },
        }).then(res => {
        if (res.data) {
@@ -68,7 +68,7 @@ interface ProfilePageProps {
 
   const saveProfile = async () => {
     await axios.put(
-      "http://localhost:4000/profile",
+      "http://83.234.227.67:4000/profile",
       form,
       {
         headers: { Authorization: `Bearer ${token}` },

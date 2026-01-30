@@ -186,14 +186,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ marketplace, nft, account }) 
   ];
 
   useEffect(() => {
-      axios.get("http://localhost:4000/profile", {
+      axios.get("http://83.234.227.67:4000/profile", {
         headers: { Authorization: `Bearer ${token}` },
          }).then(res => {
          if (res.data) {
           setForm(res.data);
           console.log("res.data>>>",res.data)
         }})
-      axios.get("http://localhost:4000/transactions/me", {
+      axios.get("http://83.234.227.67:4000/transactions/me", {
         headers: { Authorization: `Bearer ${token}` },
          }).then(res => {
          if (res.data) {
