@@ -85,7 +85,7 @@ const HomePage: React.FC<HomePageProps> = ({ marketplace, nft, account }) => {
     useEffect(() => {
         const fetchTopSellers = async () => {
           try {
-            const res = await axios.get<Seller[]>("http://83.234.227.67:4000/profile/top-sellers");
+            const res = await axios.get<Seller[]>("https://83.234.227.67:4000/profile/top-sellers");
             setTopSellers(res.data);
             console.log("homeTopseller>>>", topSellers);
           } catch (err) {
