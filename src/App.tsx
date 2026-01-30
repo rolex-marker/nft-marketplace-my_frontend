@@ -29,6 +29,8 @@ interface ProfileForm {
   avatar: string;
 }
 
+const API_URL = "https://fwpyh-83-234-227-67.a.free.pinggy.link";
+
 
 function App() {
   //real rolex-marker code
@@ -74,7 +76,7 @@ function App() {
         const address = await signer.getAddress();
   
         // 1️⃣ Request nonce from backend
-        const { data } = await axios.get<{ nonce: string }>(`http://localhost:4000/auth/nonce/${address}`);
+        const { data } = await axios.get<{ nonce: string }>(`${API_URL}/auth/nonce/${address}`);
         const nonce = data.nonce;
   
         // 2️⃣ Ask user to sign the message
@@ -84,7 +86,7 @@ function App() {
         const verify = await axios.post<{
           success: boolean;
           token: string;
-        }>('http://localhost:4000/auth/verify', {
+        }>(`${API_URL}/auth/verify`, {
           address,
           signature,
         });
@@ -94,7 +96,7 @@ function App() {
           setAccount(address);
           console.log('Login success:', address);
           loadContracts(signer); 
-           axios.get("http://localhost:4000/profile", {
+           axios.get(`${API_URL}/profile`, {
         headers: { Authorization: `Bearer ${verify.data.token}` },
          }).then(res => {
          if (res.data) {
@@ -126,7 +128,7 @@ function App() {
     };
   
     const reloadUserinfor = (): void => {
-       axios.get("http://localhost:4000/profile", {
+       axios.get(`${API_URL}/profile`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
          }).then(res => {
          if (res.data) {

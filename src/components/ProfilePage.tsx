@@ -10,7 +10,7 @@ import '../styles/globalAdd.css'
 import Loading from './loading/Loading';
 import { Contract, BigNumberish, BigNumber } from 'ethers';
 
-const API_URL = "https://bjrsd-83-234-227-67.a.free.pinggy.link";
+const API_URL = "https://fwpyh-83-234-227-67.a.free.pinggy.link";
 interface ProfilePageProps {
   marketplace: Contract | null;
   nft: Contract | null;
