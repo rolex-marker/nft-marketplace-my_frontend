@@ -38,7 +38,6 @@ interface Seller {
 
 const HomePage: React.FC<HomePageProps> = ({ marketplace, nft, account }) => {
 
-    const API_URL = "https://fwpyh-83-234-227-67.a.free.pinggy.link";
 
     const [loading, setLoading] = useState(true)
     const [items, setItems] = useState<NFTItem[]>([]);
@@ -87,7 +86,7 @@ const HomePage: React.FC<HomePageProps> = ({ marketplace, nft, account }) => {
     useEffect(() => {
         const fetchTopSellers = async () => {
           try {
-            const res = await axios.get<Seller[]>(`${API_URL}/profile/top-sellers`);
+            const res = await axios.get<Seller[]>(`/profile/top-sellers`);
             setTopSellers(res.data);
             console.log("homeTopseller>>>", topSellers);
           } catch (err) {

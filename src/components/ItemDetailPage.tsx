@@ -64,7 +64,7 @@ interface Offer {
 
 
 const ItemDetailPage: React.FC<ItemDetailPageProps> = ({ marketplace, nft, account }) => {
-  const API_URL = "https://fwpyh-83-234-227-67.a.free.pinggy.link";
+
   const { id, time } = useParams<{ id: string, time: string }>();
   console.log("id, time", id , time );
   const [showBidModal, setShowBidModal] = useState(false);
@@ -131,7 +131,7 @@ const ItemDetailPage: React.FC<ItemDetailPageProps> = ({ marketplace, nft, accou
   
         const acceptedOffer = offers[index];
         await axios.post(
-            `${API_URL}/transactions`,
+            `/transactions`,
             {
               itemId: item?.itemId,
               tokenId: item?.tokenId,
@@ -180,7 +180,7 @@ const ItemDetailPage: React.FC<ItemDetailPageProps> = ({ marketplace, nft, accou
     
 
     await axios.post(
-      `${API_URL}/transactions/`,
+      `/transactions/`,
       {
         itemId: item?.itemId,
         tokenId: item?.tokenId || null,
@@ -348,7 +348,7 @@ const finalizeAuction = async () => {
 
       if (token) {
         await axios.post(
-          `${API_URL}/transactions`,
+          `/transactions`,
           {
             itemId: item?.itemId,
             tokenId: item?.tokenId,

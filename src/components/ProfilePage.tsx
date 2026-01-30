@@ -10,7 +10,6 @@ import '../styles/globalAdd.css'
 import Loading from './loading/Loading';
 import { Contract, BigNumberish, BigNumber } from 'ethers';
 
-const API_URL = "https://fwpyh-83-234-227-67.a.free.pinggy.link";
 interface ProfilePageProps {
   marketplace: Contract | null;
   nft: Contract | null;
@@ -187,14 +186,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ marketplace, nft, account }) 
   ];
 
   useEffect(() => {
-      axios.get(`${API_URL}/profile`, {
+      axios.get(`/profile`, {
         headers: { Authorization: `Bearer ${token}` },
          }).then(res => {
          if (res.data) {
           setForm(res.data);
           console.log("res.data>>>",res.data)
         }})
-      axios.get(`${API_URL}/transactions/me`, {
+      axios.get(`/transactions/me`, {
         headers: { Authorization: `Bearer ${token}` },
          }).then(res => {
          if (res.data) {

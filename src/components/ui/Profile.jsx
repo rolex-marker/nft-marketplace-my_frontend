@@ -46,7 +46,7 @@ export default function Profile({formFir, reloadUserinfor }) {
   console.log("token>>>", token);
 
   useEffect(() => {
-    axios.get("http://localhost:4000/profile", {
+    axios.get("/profile", {
       headers: { Authorization: `Bearer ${token}` },
        }).then(res => {
        if (res.data) {
@@ -57,7 +57,7 @@ export default function Profile({formFir, reloadUserinfor }) {
 
   const saveProfile = async () => {
     await axios.put(
-      "http://localhost:4000/profile",
+      "/profile",
       form,
       {
         headers: { Authorization: `Bearer ${token}` },

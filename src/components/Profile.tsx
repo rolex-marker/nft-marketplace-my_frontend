@@ -6,7 +6,6 @@ import '../styles/globalAdd.css'
 
 const PINATA_API_KEY = 'ad6c656a7f0cc603a4ef';
 const PINATA_SECRET_API_KEY = 'd6cd229b6cfa3e565146eeebc37bb3c14375176dd128e7f5c05ebdc830c637f8';
-const API_URL = "https://fwpyh-83-234-227-67.a.free.pinggy.link";
 
 interface ProfileForm {
   username: string;
@@ -58,7 +57,7 @@ interface ProfilePageProps {
   console.log("token>>>", token);
 
   useEffect(() => {
-    axios.get(`${API_URL}/profile`, {
+    axios.get(`/profile`, {
       headers: { Authorization: `Bearer ${token}` },
        }).then(res => {
        if (res.data) {
@@ -69,7 +68,7 @@ interface ProfilePageProps {
 
   const saveProfile = async () => {
     await axios.put(
-      `${API_URL}/profile`,
+      `/profile`,
       form,
       {
         headers: { Authorization: `Bearer ${token}` },
