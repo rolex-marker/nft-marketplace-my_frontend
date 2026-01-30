@@ -64,7 +64,7 @@ interface Offer {
 
 
 const ItemDetailPage: React.FC<ItemDetailPageProps> = ({ marketplace, nft, account }) => {
-  const API_URL = "https://bjrsd-83-234-227-67.a.free.pinggy.link";
+  const API_URL = "https://fwpyh-83-234-227-67.a.free.pinggy.link";
   const { id, time } = useParams<{ id: string, time: string }>();
   console.log("id, time", id , time );
   const [showBidModal, setShowBidModal] = useState(false);

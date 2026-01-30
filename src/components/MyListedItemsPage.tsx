@@ -3,8 +3,6 @@ import { ethers } from "ethers";
 import { motion } from 'framer-motion';
 import { Package, CheckCircle, Clock, XCircle } from 'lucide-react';
 import NFTCard from './NFTCard';
-import { mockNFTs } from '../mockData';
-import { useWallet } from '../WalletContext';
 import Toast, { ToastType } from './Toast';
 import Loading from './loading/Loading';
 import '../styles/globalAdd.css'

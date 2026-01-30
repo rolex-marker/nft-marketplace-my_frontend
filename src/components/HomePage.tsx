@@ -38,7 +38,7 @@ interface Seller {
 
 const HomePage: React.FC<HomePageProps> = ({ marketplace, nft, account }) => {
 
-    const API_URL = "https://bjrsd-83-234-227-67.a.free.pinggy.link";
+    const API_URL = "https://fwpyh-83-234-227-67.a.free.pinggy.link";
 
     const [loading, setLoading] = useState(true)
     const [items, setItems] = useState<NFTItem[]>([]);

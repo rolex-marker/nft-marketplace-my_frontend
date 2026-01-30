@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { Filter, Search, SlidersHorizontal } from 'lucide-react';
 import NFTCard from './NFTCard';
 import Loading from './loading/Loading';
