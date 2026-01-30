@@ -10,6 +10,7 @@ import '../styles/globalAdd.css'
 import Loading from './loading/Loading';
 import { Contract, BigNumberish, BigNumber } from 'ethers';
 
+const API_URL = "https://bjrsd-83-234-227-67.a.free.pinggy.link";
 interface ProfilePageProps {
   marketplace: Contract | null;
   nft: Contract | null;
@@ -186,14 +187,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ marketplace, nft, account }) 
   ];
 
   useEffect(() => {
-      axios.get("https://83.234.227.67:4000/profile", {
+      axios.get(`${API_URL}/profile`, {
         headers: { Authorization: `Bearer ${token}` },
          }).then(res => {
          if (res.data) {
           setForm(res.data);
           console.log("res.data>>>",res.data)
         }})
-      axios.get("https://83.234.227.67:4000/transactions/me", {
+      axios.get(`${API_URL}/transactions/me`, {
         headers: { Authorization: `Bearer ${token}` },
          }).then(res => {
          if (res.data) {
