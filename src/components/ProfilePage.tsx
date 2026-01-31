@@ -85,67 +85,135 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ marketplace, nft, account }) 
 
   const token = localStorage.getItem("token");
   
+  // const loadListedItems = useCallback(async () => {
+  //     if (!marketplace || !nft || !account) return;
+  
+  //     setLoading(true); // start loading
+  
+  //     const itemCount = (await marketplace.itemCount()).toNumber();
+  //     let listed = [];
+  //     let myOwn = [];
+  //     let items = [];
+  //     const ownedTokenIds = new Set();
+  
+  //     for (let idx = 1; idx <= itemCount; idx++) {
+  //       const i = await marketplace.items(idx);
+  //       const uri = await nft.tokenURI(i.tokenId);
+  //       const owner = await nft.ownerOf(i.tokenId);
+  //       const metadata = await fetch(uri).then(res => res.json());
+  //       const totalPrice = await marketplace.getTotalPrice(i.itemId);
+  
+  //       const item = {
+  //         totalPrice,
+  //         price: i.price,
+  //         itemId: i.itemId,
+  //         tokenId: i.tokenId,
+  //         seller: i.seller,
+  //         name: metadata.name,
+  //         description: metadata.description,
+  //         image: metadata.image,
+  //         sold: i.sold,
+  //         isAuction: i.isAuction,
+  //         endTime: i.endTime,
+  //         offernum: i.offernum
+  //       };
+  //       items.push(item);
+  //       // 🔵 My active listings
+  //       if (i.seller.toLowerCase() === account.toLowerCase() && !i.sold) {
+  //         listed.push(item);
+  //       }
+  
+  //       // 🟢 NFTs I currently own
+  //       if (owner.toLowerCase() === account.toLowerCase() && !ownedTokenIds.has(i.tokenId.toString())) {
+  //         myOwn.push(item);
+  //         ownedTokenIds.add(i.tokenId.toString());
+  //       }
+  //     }
+  //     setMyOwn(myOwn);
+  //     setListed(listed);
+  //       setTotalListedItems(items);
+  //       const myItems = items.filter(
+  //         (nft) => nft.seller.toLowerCase() === account.toLowerCase()
+  //       )
+  //       setMyNFTs(myItems);
+  //       setCreatedNFTs(myItems);
+  //       setListedNFTs( myItems.filter((nft) => nft.sold === false ));
+  //       setPurchasedNFTs(
+  //           items.filter(
+  //             nft => nft.sold && nft.seller.toLowerCase() !== account.toLowerCase()
+  //           )
+  //         );
+  //       console.log("totalListedItem>>>", items)
+  //       setLoading(false)
+  //   }, [marketplace, nft, account]);
+
+   // ... existing imports ...
+
   const loadListedItems = useCallback(async () => {
-      if (!marketplace || !nft || !account) return;
-  
-      setLoading(true); // start loading
-  
+    if (!marketplace || !nft || !account) return;
+    setLoading(true);
+
+    try {
       const itemCount = (await marketplace.itemCount()).toNumber();
-      let listed = [];
-      let myOwn = [];
-      let items = [];
+      const indices = Array.from({ length: itemCount }, (_, i) => i + 1);
+
+      const rawItems = await Promise.all(indices.map(idx => marketplace.items(idx)));
+
+      const allItems = await Promise.all(
+        rawItems.map(async (i) => {
+          const uri = await nft.tokenURI(i.tokenId);
+          const [owner, response, totalPrice] = await Promise.all([
+            nft.ownerOf(i.tokenId),
+            fetch(uri),
+            marketplace.getTotalPrice(i.itemId)
+          ]);
+          const metadata = await response.json();
+
+          return {
+            totalPrice,
+            price: i.price,
+            itemId: i.itemId,
+            tokenId: i.tokenId,
+            seller: i.seller,
+            name: metadata.name,
+            description: metadata.description,
+            image: metadata.image,
+            sold: i.sold,
+            isAuction: i.isAuction,
+            endTime: i.endTime,
+            offernum: i.offernum,
+            owner: owner.toLowerCase()
+          };
+        })
+      );
+
+      // Local filtering
       const ownedTokenIds = new Set();
-  
-      for (let idx = 1; idx <= itemCount; idx++) {
-        const i = await marketplace.items(idx);
-        const uri = await nft.tokenURI(i.tokenId);
-        const owner = await nft.ownerOf(i.tokenId);
-        const metadata = await fetch(uri).then(res => res.json());
-        const totalPrice = await marketplace.getTotalPrice(i.itemId);
-  
-        const item = {
-          totalPrice,
-          price: i.price,
-          itemId: i.itemId,
-          tokenId: i.tokenId,
-          seller: i.seller,
-          name: metadata.name,
-          description: metadata.description,
-          image: metadata.image,
-          sold: i.sold,
-          isAuction: i.isAuction,
-          endTime: i.endTime,
-          offernum: i.offernum
-        };
-        items.push(item);
-        // 🔵 My active listings
-        if (i.seller.toLowerCase() === account.toLowerCase() && !i.sold) {
-          listed.push(item);
+      const myOwnItems: NFTItem[] = [];
+      allItems.forEach(item => {
+        if (item.owner === account.toLowerCase() && !ownedTokenIds.has(item.tokenId.toString())) {
+          myOwnItems.push(item as any);
+          ownedTokenIds.add(item.tokenId.toString());
         }
-  
-        // 🟢 NFTs I currently own
-        if (owner.toLowerCase() === account.toLowerCase() && !ownedTokenIds.has(i.tokenId.toString())) {
-          myOwn.push(item);
-          ownedTokenIds.add(i.tokenId.toString());
-        }
-      }
-      setMyOwn(myOwn);
-      setListed(listed);
-        setTotalListedItems(items);
-        const myItems = items.filter(
-          (nft) => nft.seller.toLowerCase() === account.toLowerCase()
-        )
-        setMyNFTs(myItems);
-        setCreatedNFTs(myItems);
-        setListedNFTs( myItems.filter((nft) => nft.sold === false ));
-        setPurchasedNFTs(
-            items.filter(
-              nft => nft.sold && nft.seller.toLowerCase() !== account.toLowerCase()
-            )
-          );
-        console.log("totalListedItem>>>", items)
-        setLoading(false)
-    }, [marketplace, nft, account]);
+      });
+
+      const myItems = allItems.filter(nft => nft.seller.toLowerCase() === account.toLowerCase());
+
+      setMyOwn(myOwnItems);
+      setTotalListedItems(allItems as any);
+      setMyNFTs(myItems as any);
+      setCreatedNFTs(myItems as any);
+      setListedNFTs(myItems.filter(nft => !nft.sold) as any);
+      setPurchasedNFTs(allItems.filter(nft => nft.sold && nft.seller.toLowerCase() !== account.toLowerCase()) as any);
+      
+    } catch (error) {
+      console.error("Profile load error:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [marketplace, nft, account]);
+
+// ... rest of existing code ... 
   
     useEffect(() => {
       loadListedItems();

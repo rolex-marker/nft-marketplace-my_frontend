@@ -54,76 +54,147 @@ const MyListedItemsPage: React.FC<MyListedItemsPageProps> = ({ marketplace, nft,
   const isConnected = true; 
  
 
-  const loadListedItems = useCallback(async () => {
-      if (!marketplace || !nft || !account) return null;
+  // const loadListedItems = useCallback(async () => {
+  //     if (!marketplace || !nft || !account) return null;
   
-      setLoading(true); // start loading
+  //     setLoading(true); // start loading
   
-      const itemCount = Number(await marketplace.itemCount());
-      let listed = [];
-      let myOwn = [];
-      let items = [];
-      const ownedTokenIds = new Set();
+  //     const itemCount = Number(await marketplace.itemCount());
+  //     let listed = [];
+  //     let myOwn = [];
+  //     let items = [];
+  //     const ownedTokenIds = new Set();
   
-      for (let idx = 1; idx <= itemCount; idx++) {
-        const i = await marketplace.items(idx);
-        const uri = await nft.tokenURI(i.tokenId);
-        const owner = await nft.ownerOf(i.tokenId);
-        const metadata = await fetch(uri).then(res => res.json());
-        const totalPrice = await marketplace.getTotalPrice(i.itemId);
+  //     for (let idx = 1; idx <= itemCount; idx++) {
+  //       const i = await marketplace.items(idx);
+  //       const uri = await nft.tokenURI(i.tokenId);
+  //       const owner = await nft.ownerOf(i.tokenId);
+  //       const metadata = await fetch(uri).then(res => res.json());
+  //       const totalPrice = await marketplace.getTotalPrice(i.itemId);
 
-        const data = await marketplace.getOffers(i.itemId); 
-        const parsedOffer = data.length;
+  //       const data = await marketplace.getOffers(i.itemId); 
+  //       const parsedOffer = data.length;
   
-        const item = {
-          totalPrice,
-          price: i.price,
-          itemId: i.itemId,
-          tokenId: i.tokenId,
-          seller: i.seller,
-          name: metadata.name,
-          description: metadata.description,
-          image: metadata.image,
-          sold: i.sold,
-          isAuction: i.isAuction,
-          offernum: parsedOffer,
-          endTime: i.endTime
-        };
-        items.push(item);
-        console.log('parsedOffer>>>', parsedOffer);
-        // 🔵 My active listings
-        if (i.seller.toLowerCase() === account.toLowerCase() && !i.sold) {
-          listed.push(item);
-        }
+  //       const item = {
+  //         totalPrice,
+  //         price: i.price,
+  //         itemId: i.itemId,
+  //         tokenId: i.tokenId,
+  //         seller: i.seller,
+  //         name: metadata.name,
+  //         description: metadata.description,
+  //         image: metadata.image,
+  //         sold: i.sold,
+  //         isAuction: i.isAuction,
+  //         offernum: parsedOffer,
+  //         endTime: i.endTime
+  //       };
+  //       items.push(item);
+  //       console.log('parsedOffer>>>', parsedOffer);
+  //       // 🔵 My active listings
+  //       if (i.seller.toLowerCase() === account.toLowerCase() && !i.sold) {
+  //         listed.push(item);
+  //       }
   
-        // 🟢 NFTs I currently own
-        if (owner.toLowerCase() === account.toLowerCase() && !ownedTokenIds.has(i.tokenId.toString())) {
-          myOwn.push(item);
-          ownedTokenIds.add(i.tokenId.toString());
-        }
-      }
-      setMyOwn(myOwn);
-      setListed(listed);
-      setTotalListedItems(items);
-        // derive from LOCAL items, not state
-        const myItems = items.filter(
-          (nft) => nft.seller.toLowerCase() === account.toLowerCase()
-        )
-        setMyNFTs(myItems)
-        setActiveNFTs(
-          myItems.filter((nft) => nft.sold === false && nft.isAuction === false)
-        )
-        setSoldNFTs(
-          myItems.filter((nft) => nft.sold === true && nft.isAuction === false)
-        )
-        setEndedNFTs(
-          myItems.filter((nft) => nft.isAuction === true)
-        )
-        console.log("totalListedItem>>>", items)
-        setLoading(false)
-    }, [marketplace, nft, account]);
+  //       // 🟢 NFTs I currently own
+  //       if (owner.toLowerCase() === account.toLowerCase() && !ownedTokenIds.has(i.tokenId.toString())) {
+  //         myOwn.push(item);
+  //         ownedTokenIds.add(i.tokenId.toString());
+  //       }
+  //     }
+  //     setMyOwn(myOwn);
+  //     setListed(listed);
+  //     setTotalListedItems(items);
+  //       // derive from LOCAL items, not state
+  //       const myItems = items.filter(
+  //         (nft) => nft.seller.toLowerCase() === account.toLowerCase()
+  //       )
+  //       setMyNFTs(myItems)
+  //       setActiveNFTs(
+  //         myItems.filter((nft) => nft.sold === false && nft.isAuction === false)
+  //       )
+  //       setSoldNFTs(
+  //         myItems.filter((nft) => nft.sold === true && nft.isAuction === false)
+  //       )
+  //       setEndedNFTs(
+  //         myItems.filter((nft) => nft.isAuction === true)
+  //       )
+  //       console.log("totalListedItem>>>", items)
+  //       setLoading(false)
+  //   }, [marketplace, nft, account]);
   
     // ---------- call the loader on mount ----------
+
+  // ... existing imports ...
+
+  const loadListedItems = useCallback(async () => {
+    if (!marketplace || !nft || !account) return;
+    setLoading(true);
+
+    try {
+      const itemCount = (await marketplace.itemCount()).toNumber();
+      const indices = Array.from({ length: itemCount }, (_, i) => i + 1);
+
+      // 1. Fetch all raw items from contract in parallel
+      const rawItems = await Promise.all(indices.map(i => marketplace.items(i)));
+
+      // 2. Fetch metadata, owner, price, and offers in parallel for every item
+      const allItems = await Promise.all(
+        rawItems.map(async (i) => {
+          const uri = await nft.tokenURI(i.tokenId);
+          const [owner, response, totalPrice, offersData] = await Promise.all([
+            nft.ownerOf(i.tokenId),
+            fetch(uri),
+            marketplace.getTotalPrice(i.itemId),
+            marketplace.getOffers(i.itemId)
+          ]);
+          const metadata = await response.json();
+
+          return {
+            totalPrice,
+            price: i.price,
+            itemId: i.itemId,
+            tokenId: i.tokenId,
+            seller: i.seller,
+            name: metadata.name,
+            description: metadata.description,
+            image: metadata.image,
+            sold: i.sold,
+            isAuction: i.isAuction,
+            offernum: offersData.length,
+            endTime: i.endTime,
+            owner: owner.toLowerCase()
+          };
+        })
+      );
+
+      // 3. Filter data locally (very fast)
+      const ownedTokenIds = new Set();
+      const myOwnItems: ListedNFT[] = [];
+      allItems.forEach(item => {
+        if (item.owner === account.toLowerCase() && !ownedTokenIds.has(item.tokenId.toString())) {
+          myOwnItems.push(item as any);
+          ownedTokenIds.add(item.tokenId.toString());
+        }
+      });
+
+      const myItems = allItems.filter(item => item.seller.toLowerCase() === account.toLowerCase());
+      
+      setMyOwn(myOwnItems);
+      setListed(myItems.filter(i => !i.sold) as any);
+      setTotalListedItems(allItems as any);
+      setMyNFTs(myItems as any);
+      setActiveNFTs(myItems.filter(i => !i.sold && !i.isAuction) as any);
+      setSoldNFTs(myItems.filter(i => i.sold && !i.isAuction) as any);
+      setEndedNFTs(myItems.filter(i => i.isAuction) as any);
+    } catch (error) {
+      console.error("Error loading listed items:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [marketplace, nft, account]);
+
+// ... rest of existing code ...
     useEffect(() => {
       loadListedItems();
     }, [loadListedItems]); 

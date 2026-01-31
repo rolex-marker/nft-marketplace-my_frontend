@@ -137,16 +137,16 @@ const Header: React.FC<HeaderProps> = ({ loginWithMetaMask, disConnectWallet, ac
                     {item.name}
                   </Link>
                 ))}
-                {isConnected && address ? (
+                {account ? (
                   <button
                     onClick={() => {
-                      disconnectWallet();
+                      disConnectWallet();
                       setMobileMenuOpen(false);
                     }}
                     className="w-full flex items-center justify-center space-x-2 px-5 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium"
                   >
                     <Wallet className="w-4 h-4" />
-                    <span>{shortenAddress(address)}</span>
+                    <span>{shortenAddress(account? account: "")}</span>
                   </button>
                 ) : (
                   <button

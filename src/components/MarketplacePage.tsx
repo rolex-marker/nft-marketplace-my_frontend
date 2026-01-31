@@ -41,45 +41,87 @@ const MarketplacePage: React.FC<HomePageProps> = ({ marketplace, nft, account })
   const [items, setItems] = useState<MarketplaceItem[]>([]);
   
 
-  const loadMarketplaceItems = useCallback(async () => {
-      // Load all unsold items
-      const itemCount = (await marketplace.itemCount()).toNumber();
-     const loadedItems: MarketplaceItem[] = [];
-      for (let i = 1; i <= itemCount; i++) {
+  // const loadMarketplaceItems = useCallback(async () => {
+  //     // Load all unsold items
+  //     const itemCount = (await marketplace.itemCount()).toNumber();
+  //    const loadedItems: MarketplaceItem[] = [];
+  //     for (let i = 1; i <= itemCount; i++) {
          
-        const item = await marketplace.items(i)
+  //       const item = await marketplace.items(i)
         
-          // get uri url from nft contract
-          const uri = await nft.tokenURI(item.tokenId);
+  //         // get uri url from nft contract
+  //         const uri = await nft.tokenURI(item.tokenId);
           
-          // use uri to fetch the nft metadata stored on ipfs 
-          const response = await fetch(uri)
-          const metadata = await response.json()
-          // get total price of item (item price + fee)
-          const totalPrice = await marketplace.getTotalPrice(item.itemId)
-          // Add item to items array
-          loadedItems.push({
-            totalPrice,
-            itemId: item.itemId,
-            seller: item.seller,
-            tokenId: item.tokenId,
-            name: metadata.name,
-            description: metadata.description,
-            image: metadata.image,
-            category: metadata.category,
-            availitem: metadata.availitem,
-            isAuction: item.isAuction,
-            sold: item.sold,
-            endTime: item.endTime,
-            offernum: item.offernum
-          })
+  //         // use uri to fetch the nft metadata stored on ipfs 
+  //         const response = await fetch(uri)
+  //         const metadata = await response.json()
+  //         // get total price of item (item price + fee)
+  //         const totalPrice = await marketplace.getTotalPrice(item.itemId)
+  //         // Add item to items array
+  //         loadedItems.push({
+  //           totalPrice,
+  //           itemId: item.itemId,
+  //           seller: item.seller,
+  //           tokenId: item.tokenId,
+  //           name: metadata.name,
+  //           description: metadata.description,
+  //           image: metadata.image,
+  //           category: metadata.category,
+  //           availitem: metadata.availitem,
+  //           isAuction: item.isAuction,
+  //           sold: item.sold,
+  //           endTime: item.endTime,
+  //           offernum: item.offernum
+  //         })
            
         
        
-      }
-      setLoading(false)
-      setItems(loadedItems)
-    }, [marketplace, nft]);
+  //     }
+  //     setLoading(false)
+  //     setItems(loadedItems)
+  //   }, [marketplace, nft]);
+
+  const loadMarketplaceItems = useCallback(async () => {
+    const itemCount = (await marketplace.itemCount()).toNumber();
+    
+    // 1. Create an array of indices [1, 2, 3...]
+    const indices = Array.from({ length: itemCount }, (_, i) => i + 1);
+
+    // 2. Fetch all raw items in parallel
+    const rawItems = await Promise.all(
+      indices.map(i => marketplace.items(i))
+    );
+
+    // 3. Fetch all metadata (IPFS) and prices in parallel
+    const loadedItems = await Promise.all(
+      rawItems.map(async (item) => {
+        const uri = await nft.tokenURI(item.tokenId);
+        const [response, totalPrice] = await Promise.all([
+          fetch(uri),
+          marketplace.getTotalPrice(item.itemId)
+        ]);
+        const metadata = await response.json();
+        
+        return {
+          totalPrice,
+          itemId: item.itemId,
+          seller: item.seller,
+          tokenId: item.tokenId,
+          name: metadata.name,
+          description: metadata.description,
+          image: metadata.image,
+          category: metadata.category,
+          isAuction: item.isAuction,
+          sold: item.sold,
+          endTime: item.endTime,
+          offernum: item.offernum
+        };
+      })
+    );
+
+    setItems(loadedItems);
+    setLoading(false);
+}, [marketplace, nft]);
 
     useEffect(() => {
         loadMarketplaceItems()
