@@ -352,7 +352,7 @@ const finalizeAuction = async () => {
       const tx = await marketplace.finalizeAuction(item?.itemId);
       const receipt = await tx.wait();
 
-      alert("Auction finalized successfully 🎉");
+      // alert("Auction finalized successfully 🎉");
 
       if (token) {
         await axios.post(
@@ -362,7 +362,7 @@ const finalizeAuction = async () => {
             tokenId: item?.tokenId,
             price: highestBidFormatted,
             seller: item?.seller,
-            buyer: item?.highestBidder,
+            buyer: item?.highestBidder ? item?.highestBidder: account,
             type: "AUCTION",
             txHash: receipt.transactionHash,
           },
@@ -382,12 +382,10 @@ const finalizeAuction = async () => {
       console.error("Auction finalization failed:", err);
       alert("Auction finalization failed: " );
     } finally {
-      setButtonLoading(false);
-      
+      setButtonLoading(false); 
     }
   };
 
- 
   const handleBuyNow = () => {
      
     if (!account) {
@@ -395,7 +393,6 @@ const finalizeAuction = async () => {
       return;
     }
     phurchase();
-    
   };
 
   const handlePlaceBid = (amount: number) => {
@@ -406,20 +403,16 @@ const finalizeAuction = async () => {
     makeOffer(amount);
   };
 
-  
-
   useEffect(() => {
       loadOffers();
       
     }, [marketplace]);
 
-  
-
-  
   if (loading || !item || isofferLoading) return <Loading content="Loading Content... Plaese Wait" />;
   if (account === null) return (
       <Loading content="Connect your Wallet" />
     )
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Back Button */}
