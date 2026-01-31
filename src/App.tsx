@@ -22,6 +22,7 @@ import Loading from './components/loading/Loading';
 import {Footer} from './components/Footer';
 import { Contract, Signer } from 'ethers';
 
+const VITE_API_URL="https://okilm-83-234-227-67.a.free.pinggy.link";
 
 interface ProfileForm {
   username: string;
@@ -29,11 +30,10 @@ interface ProfileForm {
   avatar: string;
 }
 
-const API_URL = "https://fwpyh-83-234-227-67.a.free.pinggy.link";
-
 
 function App() {
   //real rolex-marker code
+  console.log("API_Key>>>", VITE_API_URL);
     const [loading, setLoading] = useState<boolean>(true);
     const [account, setAccount] = useState<string|null>(null);  
     const [marketplace, setMarketplace] = useState<Contract|null>(null);
@@ -76,7 +76,7 @@ function App() {
         const address = await signer.getAddress();
   
         // 1️⃣ Request nonce from backend
-        const { data } = await axios.get<{ nonce: string }>(`${API_URL}/auth/nonce/${address}`);
+        const { data } = await axios.get<{ nonce: string }>(`${VITE_API_URL}/auth/nonce/${address}`);
         const nonce = data.nonce;
   
         // 2️⃣ Ask user to sign the message
@@ -86,7 +86,7 @@ function App() {
         const verify = await axios.post<{
           success: boolean;
           token: string;
-        }>(`${API_URL}/auth/verify`, {
+        }>(`${VITE_API_URL}/auth/verify`, {
           address,
           signature,
         });
@@ -96,7 +96,7 @@ function App() {
           setAccount(address);
           console.log('Login success:', address);
           loadContracts(signer); 
-           axios.get(`${API_URL}/profile`, {
+           axios.get(`${VITE_API_URL}/profile`, {
         headers: { Authorization: `Bearer ${verify.data.token}` },
          }).then(res => {
          if (res.data) {
@@ -128,7 +128,7 @@ function App() {
     };
   
     const reloadUserinfor = (): void => {
-       axios.get(`${API_URL}/profile`, {
+       axios.get(`${VITE_API_URL}/profile`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
          }).then(res => {
          if (res.data) {
