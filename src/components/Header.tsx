@@ -23,7 +23,6 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ loginWithMetaMask, disConnectWallet, account, form }) => {
   const location = useLocation();
-  const { isConnected, address, disconnectWallet } = useWallet();
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 

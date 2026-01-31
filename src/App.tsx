@@ -50,6 +50,14 @@ function App() {
       }
       try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const { chainId } = await provider.getNetwork();
+
+          const SEPOLIA_CHAIN_ID = 11155111; // 0xaa36a7
+
+          if (chainId !== SEPOLIA_CHAIN_ID) {
+            alert("Please switch your MetaMask network to Sepolia!");
+            // Optional: Trigger a network switch request here
+          }
         await provider.send('eth_requestAccounts', []);
         const signer = provider.getSigner();
         const address = await signer.getAddress();
