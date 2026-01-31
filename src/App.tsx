@@ -33,7 +33,6 @@ interface ProfileForm {
 
 function App() {
   //real rolex-marker code
-  console.log("API_Key>>>", VITE_API_URL);
     const [loading, setLoading] = useState<boolean>(true);
     const [account, setAccount] = useState<string|null>(null);  
     const [marketplace, setMarketplace] = useState<Contract|null>(null);
