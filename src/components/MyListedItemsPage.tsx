@@ -138,13 +138,19 @@ const MyListedItemsPage: React.FC<MyListedItemsPageProps> = ({ marketplace, nft,
       // 1. Fetch all raw items from contract in parallel
       const rawItems = await Promise.all(indices.map(i => marketplace.items(i)));
 
+      const getFastUri = (uri: string) => {
+          // Replace slow ipfs.io with fast cloudflare-ipfs.com or your own Pinata gateway
+          return uri.replace("https://ipfs.io/ipfs/", "https://cloudflare-ipfs.com/ipfs/")
+                    .replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/");
+        };
+
       // 2. Fetch metadata, owner, price, and offers in parallel for every item
       const allItems = await Promise.all(
         rawItems.map(async (i) => {
           const uri = await nft.tokenURI(i.tokenId);
           const [owner, response, totalPrice, offersData] = await Promise.all([
             nft.ownerOf(i.tokenId),
-            fetch(uri),
+            fetch(getFastUri(uri)),
             marketplace.getTotalPrice(i.itemId),
             marketplace.getOffers(i.itemId)
           ]);

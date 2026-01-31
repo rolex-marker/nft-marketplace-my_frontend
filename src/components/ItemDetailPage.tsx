@@ -246,9 +246,16 @@ const ItemDetailPage: React.FC<ItemDetailPageProps> = ({ marketplace, nft, accou
     
     if (!itemId) return;
 
+    // Add this helper function at the top of your file
+      const getFastUri = (uri: string) => {
+        // Replace slow ipfs.io with fast cloudflare-ipfs.com or your own Pinata gateway
+        return uri.replace("https://ipfs.io/ipfs/", "https://cloudflare-ipfs.com/ipfs/")
+                  .replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/");
+      };
+
     const itemData = await marketplace.items(itemId);
     const uri = await nft.tokenURI(itemData.tokenId);
-    const metadata = await fetch(uri).then(res => res.json());
+    const metadata = await fetch(getFastUri(uri)).then(res => res.json());
     const totalPrice = await marketplace.getTotalPrice(itemId);
 
     setItem({

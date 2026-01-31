@@ -93,10 +93,17 @@ const HomePage: React.FC<HomePageProps> = ({ marketplace, nft, account }) => {
         indices.map(async (i) => {
           const item = await marketplace.items(i);
           const uri = await nft.tokenURI(item.tokenId);
+
+          // Add this helper function at the top of your file
+            const getFastUri = (uri: string) => {
+              // Replace slow ipfs.io with fast cloudflare-ipfs.com or your own Pinata gateway
+              return uri.replace("https://ipfs.io/ipfs/", "https://cloudflare-ipfs.com/ipfs/")
+                        .replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/");
+            };
           
           // Fetch IPFS and Price simultaneously
           const [response, totalPrice] = await Promise.all([
-            fetch(uri),
+            fetch(getFastUri(uri)),
             marketplace.getTotalPrice(item.itemId)
           ]);
           
