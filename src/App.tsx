@@ -22,7 +22,7 @@ import Loading from './components/loading/Loading';
 import {Footer} from './components/Footer';
 import { Contract, Signer } from 'ethers';
 
-// const VITE_API_URL="https://okilm-83-234-227-67.a.free.pinggy.link";
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 interface ProfileForm {
   username: string;
