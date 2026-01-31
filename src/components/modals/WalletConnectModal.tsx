@@ -9,12 +9,10 @@ interface WalletConnectModalProps {
   loginWithMetaMask: () => void;
 }
 
-const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ loginWithMetaMask, isOpen, onClose }) => {
-  const { connectWallet } = useWallet();
+   const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ loginWithMetaMask, isOpen, onClose }) => {
 
   const handleConnect = () => {
     loginWithMetaMask();
-    // connectWallet();
     onClose();
   };
 

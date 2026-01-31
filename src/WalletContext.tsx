@@ -16,7 +16,6 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const connectWallet = () => {
     // Mock wallet connection
     setIsConnected(true);
-    setAddress('0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb');
   };
 
   const disconnectWallet = () => {
