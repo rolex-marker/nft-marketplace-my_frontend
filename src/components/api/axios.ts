@@ -6,6 +6,6 @@ export const api = axios.create({
   baseURL: API_BASE,
   withCredentials: true,
   headers: {
-    "bypass-tunnel-reminder": "true" // This tells Pinggy to skip the warning page
+    'pgy-no-browser-warning': 'true' // This bypasses the Pinggy warning page
   }
 });
