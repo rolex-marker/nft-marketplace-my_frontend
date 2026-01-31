@@ -7,6 +7,8 @@ import NFTCard from './NFTCard';
 import Loading from './loading/Loading';
 import { Contract, ethers, BigNumber,BigNumberish } from "ethers";
 
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+
 interface HomePageProps {
   marketplace: Contract|null;
   nft: Contract|null;

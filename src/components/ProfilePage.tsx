@@ -10,6 +10,8 @@ import '../styles/globalAdd.css'
 import Loading from './loading/Loading';
 import { Contract, BigNumberish, BigNumber } from 'ethers';
 
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+
 interface ProfilePageProps {
   marketplace: Contract | null;
   nft: Contract | null;
