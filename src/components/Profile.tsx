@@ -3,7 +3,7 @@ import axios from "axios";
 import { Contract } from "ethers";
 import '../styles/globalAdd.css'
 
-
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 const PINATA_API_KEY = 'ad6c656a7f0cc603a4ef';
 const PINATA_SECRET_API_KEY = 'd6cd229b6cfa3e565146eeebc37bb3c14375176dd128e7f5c05ebdc830c637f8';
 

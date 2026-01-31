@@ -26,6 +26,7 @@ import useCountdown from "./api/useCountdown";
 import Loading from './loading/Loading';
 import { useNavigate } from 'react-router-dom';
 
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 // types.ts (or top of file)
 
