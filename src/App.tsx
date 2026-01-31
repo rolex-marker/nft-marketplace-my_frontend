@@ -95,7 +95,7 @@ function App() {
           setAccount(address);
           console.log('Login success:', address);
           loadContracts(signer); 
-           axios.get(`$/profile`, {
+           axios.get(`/profile`, {
         headers: { Authorization: `Bearer ${verify.data.token}` },
          }).then(res => {
          if (res.data) {
