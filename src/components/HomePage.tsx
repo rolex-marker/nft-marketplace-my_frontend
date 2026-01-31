@@ -45,39 +45,88 @@ const HomePage: React.FC<HomePageProps> = ({ marketplace, nft, account }) => {
     const [items, setItems] = useState<NFTItem[]>([]);
     const [topSellers, setTopSellers] = useState<Seller[]>([]);
 
-    const loadMarketplaceItems = useCallback(async () => {
-      if (!marketplace || !nft) return;
+    // const loadMarketplaceItems = useCallback(async () => {
+    //   if (!marketplace || !nft) return;
 
-      const itemCount = Number(await marketplace.itemCount());
-      const loaded: NFTItem[] = [];
+    //   const itemCount = Number(await marketplace.itemCount());
+    //   const loaded: NFTItem[] = [];
 
-      for (let i = 1; i <= itemCount; i++) {
-        const item = await marketplace.items(i);
-        const uri = await nft.tokenURI(item.tokenId);
-        const metadata = await (await fetch(uri)).json();
-        const totalPrice = await marketplace.getTotalPrice(item.itemId);
+    //   for (let i = 1; i <= itemCount; i++) {
+    //     const item = await marketplace.items(i);
+    //     const uri = await nft.tokenURI(item.tokenId);
+    //     const metadata = await (await fetch(uri)).json();
+    //     const totalPrice = await marketplace.getTotalPrice(item.itemId);
 
-        loaded.push({
-          totalPrice,
-          itemId: item.itemId,
-          seller: item.seller,
-          tokenId: item.tokenId,
-          name: metadata.name,
-          description: metadata.description,
-          image: metadata.image,
-          category: metadata.category,
-          availitem: metadata.availitem,
-          isAuction: item.isAuction,
-          sold: item.sold,
-          endTime: item.endTime,
-          offernum: item.offernum
-        });
-      }
+    //     loaded.push({
+    //       totalPrice,
+    //       itemId: item.itemId,
+    //       seller: item.seller,
+    //       tokenId: item.tokenId,
+    //       name: metadata.name,
+    //       description: metadata.description,
+    //       image: metadata.image,
+    //       category: metadata.category,
+    //       availitem: metadata.availitem,
+    //       isAuction: item.isAuction,
+    //       sold: item.sold,
+    //       endTime: item.endTime,
+    //       offernum: item.offernum
+    //     });
+    //   }
 
-      setItems(loaded);
+    //   setItems(loaded);
+    //   setLoading(false);
+    // }, [marketplace, nft]);
+
+      const loadItems = useCallback(async () => {
+    if (!marketplace || !nft) return;
+    setLoading(true);
+
+    try {
+      const itemCount = (await marketplace.itemCount()).toNumber();
+      
+      // 1. Generate array of indices [1, 2, 3...]
+      const indices = Array.from({ length: itemCount }, (_, i) => i + 1);
+
+      // 2. Fetch all raw items and metadata in parallel
+      const loadedItems = await Promise.all(
+        indices.map(async (i) => {
+          const item = await marketplace.items(i);
+          const uri = await nft.tokenURI(item.tokenId);
+          
+          // Fetch IPFS and Price simultaneously
+          const [response, totalPrice] = await Promise.all([
+            fetch(uri),
+            marketplace.getTotalPrice(item.itemId)
+          ]);
+          
+          const metadata = await response.json();
+          
+          return {
+            totalPrice,
+            itemId: item.itemId,
+            seller: item.seller,
+            tokenId: item.tokenId,
+            name: metadata.name,
+            description: metadata.description,
+            image: metadata.image,
+            category: metadata.category,
+            isAuction: item.isAuction,
+            sold: item.sold,
+            endTime: item.endTime,
+            offernum: item.offernum
+          };
+        })
+      );
+
+      // 3. Sort by ID (newest first) or slice for "Featured" section
+      setItems(loadedItems.reverse().slice(0, 8)); 
+    } catch (error) {
+      console.error("Error loading home items:", error);
+    } finally {
       setLoading(false);
-    }, [marketplace, nft]);
-
+    }
+  }, [marketplace, nft]);
     const trendingitems = useMemo(() => items.slice(0, 4), [items]);
     const auctionitems = useMemo(
       () => items.filter(i => i.isAuction).slice(0, 4),
@@ -99,8 +148,8 @@ const HomePage: React.FC<HomePageProps> = ({ marketplace, nft, account }) => {
       }, []);
   
     useEffect(() => {
-      loadMarketplaceItems()
-    }, [loadMarketplaceItems])
+      loadItems()
+    }, [loadItems])
 
     if (loading) return (
       <Loading content="Loading Homepage... Pleasee Wait"/>
