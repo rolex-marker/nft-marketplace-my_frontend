@@ -92,12 +92,17 @@ const MarketplacePage: React.FC<HomePageProps> = ({ marketplace, nft, account })
       indices.map(i => marketplace.items(i))
     );
 
+    const getFastUri = (uri: string) => {
+        // Replace slow ipfs.io with fast cloudflare-ipfs.com or your own Pinata gateway
+        return uri.replace("https://ipfs.io/ipfs/", "https://cloudflare-ipfs.com/ipfs/")
+                  .replace("ipfs://", "https://cloudflare-ipfs.com/ipfs/");
+      };
     // 3. Fetch all metadata (IPFS) and prices in parallel
     const loadedItems = await Promise.all(
       rawItems.map(async (item) => {
         const uri = await nft.tokenURI(item.tokenId);
         const [response, totalPrice] = await Promise.all([
-          fetch(uri),
+          fetch(getFastUri(uri)),
           marketplace.getTotalPrice(item.itemId)
         ]);
         const metadata = await response.json();

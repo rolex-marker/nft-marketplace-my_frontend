@@ -105,6 +105,7 @@ useEffect(() => {
         <div className="relative overflow-hidden aspect-square px-3 py-2 bg-gray-100 hero-image-container">
           <img
             src={nft.image}
+            loading='lazy'
             alt={nft.name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 bids-card_img"
           />

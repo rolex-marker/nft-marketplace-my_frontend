@@ -212,6 +212,7 @@ const CreateNFTPage: React.FC<CreateNFTPageProps> = ({ marketplace, nft, account
                 <div className="relative aspect-square rounded-2xl overflow-hidden group">
                   <img
                     src={image}
+                    loading='lazy'
                     alt="Uploading to IPFS..."
                     className="w-full h-full object-cover"
                   />
@@ -376,7 +377,7 @@ const CreateNFTPage: React.FC<CreateNFTPageProps> = ({ marketplace, nft, account
                   <h4 className="font-semibold text-gray-900 mb-3">Preview</h4>
                   <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="aspect-square rounded-lg overflow-hidden mb-3">
-                      <img src={image} alt="Preview Mint.." className="w-full h-full object-cover" />
+                      <img src={image} loading='lazy' alt="Preview Mint.." className="w-full h-full object-cover" />
                     </div>
                     <h5 className="font-semibold text-gray-900 mb-1">{name}</h5>
                     <p className="text-sm text-gray-600 mb-2 line-clamp-2">{description}</p>
